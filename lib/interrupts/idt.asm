@@ -1,36 +1,9 @@
-
-;                    kernel.asm                 
-;	            Initialization              
-
-bits 32
-section .text
-        align 4
-        dd 0x1BADB002              	
-        dd 0x00                    	
-        dd - (0x1BADB002 + 0x00)   	
-
-global port_byte_in
-global start
-extern kmain 				
-
-port_byte_in:
-	mov dx, word [esp + 4]
-	in al, dx
-	ret
-start:
-	cli 				
-	mov esp, stack_space		
-	call kmain
-	hlt 				
-
-section .bss
-resb 8192
-
 %macro isr_err_stub 1
 isr_stub_%+%1:
     call exception_handler
     iret 
 %endmacro
+
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
     call exception_handler
@@ -78,5 +51,3 @@ isr_stub_table:
     dd isr_stub_%+i
 %assign i i+1 
 %endrep
-
-stack_space:

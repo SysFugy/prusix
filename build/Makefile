@@ -23,6 +23,7 @@ compile_kernel: $(KERNEL_ASM_OBJ) $(KERNEL_OBJ)
 $(KERNEL_ASM_OBJ): $(KERNEL_ASM)
 	echo "[Prusix] Compiling assembly initialization part..."; \
 	nasm -f elf32 $(KERNEL_ASM) -o $(KERNEL_ASM_OBJ)
+	nasm -f elf32 ../lib/interrupts/idt.asm -o ../lib/interrupts/getaddr.o
 
 $(KERNEL_OBJ): $(KERNEL_C)
 	echo "[Prusix] Compiling kernel..."; \

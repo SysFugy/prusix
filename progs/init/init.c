@@ -17,7 +17,10 @@ void init(const int mode) {
 		check_acpi();
 		//check_vga();
 		check_ps2();
-		
+
+		initGDT();
+		idt_init();
+
 		newline();
 	}
 	
@@ -47,12 +50,17 @@ void init(const int mode) {
 			scan(input_buffer, BUFFER_SIZE, 15);
 
 			if (strcmp(input_buffer, "panic") == 0) init(4);
+			else if(strcmp(input_buffer, "test_bsod") == 0){bsod("909_TESTERROR", "THIS IS A TEST BSOD, PRESS ANY KEY TO LEAVE"); anykey();}
+			else if(strcmp(input_buffer, "test_printf") == 0){printf("%s%d\n", "string, next: number - ", 10);}
+			else if(strcmp(input_buffer, "test_mouse") == 0){printf("%s\n", "---> Running mouse test..."); scanMouse();}
+			else if(strcmp(input_buffer, "int") == 0){printf("%d\n", 0 / 0); while (1);}
+			else if(strcmp(input_buffer, "im_ghoul") == 0){ghoul();}
 			else if (strcmp(input_buffer, "off") == 0) init(5);
 			else if (strncmp(input_buffer, "mode", 4) == 0) {
 				int mode;
 				if (sscanf_c(input_buffer + 5, &mode)) init(mode);
 			}
-			
+
 			else if(strcmp(input_buffer, "") == 0) {
 				// Ignoring
 			} 

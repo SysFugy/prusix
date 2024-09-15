@@ -18,4 +18,10 @@
 #include "msg.h"
 #include "check_drivers.h"
 
+#include "../libc/all.h"
+
+#include "./fun/ghoul.h"
+#include "./interrupts/getaddr.h" // not yet.
+#include "./GDT/gdt.h"
+
 #endif 

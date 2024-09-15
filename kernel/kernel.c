@@ -15,6 +15,13 @@
 
 #include "../progs/init/init.c"
 
+__attribute__((noreturn))
+void exception_handler(void);
+void exception_handler() {
+	bsod("ERR_CPU_EXCEPTION", "CPU INTERRUPT DETECTED!");
+	__asm__("hlt");
+}
+
 void kmain(void) {
 	init(0);	// Initialize IDT
 	init(1);	// Prepare

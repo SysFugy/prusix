@@ -10,6 +10,8 @@
 unsigned int current_loc = 0;
 char *vidptr = (char*)0xb8000;
 
+uint16_t* vidptr_int = (uint16_t*)0xB8000;
+
 //////////////// Scancodes array ///////////////
 
 uint8_t KEYBOARD_SCANCODES[128] = {
@@ -54,12 +56,29 @@ uint8_t KEYBOARD_SCANCODES_UPPER[128] = {
 
 ////////////////// Clear screen ////////////////
 
+uint16_t mask_symbol(uint8_t color, char c){// color - 0b000 - RGB; char - char to be masked
+	return (uint16_t)((uint8_t)color << 4) << 8 | (uint16_t)c;
+}
+
+uint16_t mask_symbol_full(uint8_t color, char c){
+	return ((uint16_t)color << 8) | (uint16_t)c;
+}
+
 void clearscreen(void) {
 	unsigned int i = 0;
 	while (i < SCREENSIZE) {
-		vidptr[i++] = ' ';
-		vidptr[i++] = 0x07;
+		vidptr_int[i++] = mask_symbol(0b000, ' ');
 	}
+	
+	current_loc = 0;
+}
+
+void clearscreen_bsod(void) {
+	for(int i = 0; i < SCREENSIZE; i++){
+		vidptr_int[i] = mask_symbol(0b001, ' ');
+	}
+
+	current_loc = 0;
 }
 
 /////////////////// Scroll up //////////////////
@@ -109,8 +128,36 @@ char __getch() {
     }
 }
 
+void anykey(){ // gde tut na keyborde etot anykey?
+	char c;
+	sleep(10);
+	while(1){
+		c = __getch();
+
+		if(c == 0) continue;
+
+		clearscreen();
+		break;
+	}
+}
+
 /////////////////// Scan input /////////////////
 
+void scanMouse(){
+	outb(0x60, 0xF4);
+
+	println("-> Waiting for mouse response...", 15);
+
+	while(inb(0x64) & 1 == 0){}
+
+	uint16_t res = inb(0x64);
+
+	char* buf;
+	its(res, 10, buf);
+
+	if(res != 0xFA){println("OK, received data from mouse, displaying it below!", 15); println(buf, 10);}
+	else{println("STRANGE, received 0xFA from mouse, maybe its controller is broken...?", 12);}
+}
 
 void scan(char *buffer, unsigned int buffer_size, const int color) {
     unsigned int index = 0;
@@ -186,7 +233,7 @@ void print(const char *str, int color) {
         vidptr[current_loc++] = color;
         i++;
     }
-    
+
     if (current_loc >= SCREENSIZE) scroll_up();
 }
 
@@ -195,6 +242,14 @@ void print(const char *str, int color) {
 void println(const char *str, const int color) {
 	print(str,color);
 	newline();
+}
+
+void printcolor(char* str, uint16_t data){
+	while(*str != '\0'){
+		vidptr[current_loc++] = *str;
+		vidptr[current_loc++] = data;
+		*str++;
+	}
 }
 
 ///////////////// Int to string ////////////////
