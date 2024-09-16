@@ -7,10 +7,15 @@
 
 /////////////////// Variables //////////////////
 
-unsigned int current_loc = 0;
-char *vidptr = (char*)0xb8000;
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 25
 
-uint16_t* vidptr_int = (uint16_t*)0xB8000;
+#define BG_COLOR 0b000
+
+unsigned int xPos = 0;
+unsigned int yPos = 0;
+
+uint16_t* vidptr = (uint16_t*)0xB8000;
 
 //////////////// Scancodes array ///////////////
 
@@ -57,7 +62,8 @@ uint8_t KEYBOARD_SCANCODES_UPPER[128] = {
 ////////////////// Clear screen ////////////////
 
 uint16_t mask_symbol(uint8_t color, char c){// color - 0b000 - RGB; char - char to be masked
-	return (uint16_t)((uint8_t)color << 4) << 8 | (uint16_t)c;
+	//return (uint16_t)((uint8_t)color << 4) << 8 | (uint16_t)c;
+	return (uint16_t)(color << 4 | (uint8_t)0b1111) << 8 | (uint16_t)c;
 }
 
 uint16_t mask_symbol_full(uint8_t color, char c){
@@ -67,34 +73,59 @@ uint16_t mask_symbol_full(uint8_t color, char c){
 void clearscreen(void) {
 	unsigned int i = 0;
 	while (i < SCREENSIZE) {
-		vidptr_int[i++] = mask_symbol(0b000, ' ');
+		vidptr[i++] = mask_symbol(BG_COLOR, ' ');
 	}
-	
-	current_loc = 0;
+
+	xPos = 0;
+	yPos = 0;
 }
 
 void clearscreen_bsod(void) {
-	for(int i = 0; i < SCREENSIZE; i++){
-		vidptr_int[i] = mask_symbol(0b001, ' ');
+	for(int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++){
+		vidptr[i] = mask_symbol(0b001, ' ');
 	}
 
-	current_loc = 0;
+	xPos = 0;
+	yPos = 0;
 }
 
 /////////////////// Scroll up //////////////////
 
 void scroll_up(void) {
-	clearscreen();
-   	unsigned int i;
-    	for (i = current_loc; i < SCREENSIZE; i++) vidptr[i - current_loc] = vidptr[i];
-	current_loc = 0;
+	clearscreen(); // not realized yet
+}
+
+////////////////// Add 1 symbol to xPos || (xPos && yPos) ///
+
+void pospp(bool newline){
+	if(!newline){
+		xPos++;
+
+		if(xPos >= VGA_WIDTH){yPos++;}
+	}
+	else{
+		xPos = 0;
+		yPos++;
+	}
+
+	if(yPos >= VGA_HEIGHT){clearscreen();}
+}
+
+void posmm(void){
+	xPos--;
+
+	if(xPos < 0){
+		xPos = VGA_WIDTH;
+		yPos--;
+	}
+
+	if(yPos < 0){clearscreen();}
 }
 
 //////////////////// Newline ///////////////////
 
 void newline(void) {
-	unsigned int line_size = BYTES_FOR_EACH_ELEMENT * COLUMNS_IN_LINE;
-	current_loc = current_loc + (line_size - current_loc % (line_size));
+	pospp(true); // add new line
 }
 
 /////// Boolean Variables for uppercase ////////
@@ -180,9 +211,8 @@ void scan(char *buffer, unsigned int buffer_size, const int color) {
         else if (c == '\b') { 
             if (index > 0) {
                 index--;
-                vidptr[current_loc - 2] = ' ';
-                vidptr[current_loc - 1] = color;
-                current_loc -= BYTES_FOR_EACH_ELEMENT;
+                vidptr[yPos * VGA_WIDTH + xPos - 1] = mask_symbol(BG_COLOR, ' ');
+		posmm();
             }
         }
         
@@ -193,13 +223,13 @@ void scan(char *buffer, unsigned int buffer_size, const int color) {
         else {
             if (index < buffer_size - 1) {
                 buffer[index++] = c;
-                vidptr[current_loc++] = c;
-                vidptr[current_loc++] = color;
+                vidptr[yPos * VGA_WIDTH + xPos] = mask_symbol(BG_COLOR, c);
+		pospp(false);
             }
         }
         
         // Scrolling
-        if (current_loc >= SCREENSIZE - BYTES_FOR_EACH_ELEMENT * COLUMNS_IN_LINE) scroll_up();
+        if (yPos == VGA_HEIGHT) scroll_up();
     }
 }
 
@@ -228,13 +258,13 @@ void uits(uint32_t number, char *buffer, size_t buffer_size) {
 void print(const char *str, int color) {
     unsigned int i = 0;
     while (str[i] != '\0') {
-        if (current_loc >= SCREENSIZE) scroll_up();
-        vidptr[current_loc++] = str[i];
-        vidptr[current_loc++] = color;
+        vidptr[yPos * VGA_WIDTH + xPos] = mask_symbol(BG_COLOR, str[i]);
+	pospp(false);
+
         i++;
     }
 
-    if (current_loc >= SCREENSIZE) scroll_up();
+    if (yPos >= VGA_HEIGHT) scroll_up();
 }
 
 ////////////// Print with newline //////////////
@@ -246,8 +276,7 @@ void println(const char *str, const int color) {
 
 void printcolor(char* str, uint16_t data){
 	while(*str != '\0'){
-		vidptr[current_loc++] = *str;
-		vidptr[current_loc++] = data;
+		vidptr[yPos * VGA_WIDTH + xPos] = mask_symbol(data, *str);
 		*str++;
 	}
 }
