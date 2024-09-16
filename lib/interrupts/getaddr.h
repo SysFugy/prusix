@@ -23,10 +23,10 @@ void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags){
 	idt_entry_t* descriptor = &vectors[vector];
 
 	descriptor->isr_low = (uint32_t)isr & 0xFFFF;
-	descriptor->kernel_cs = 0x00;
+	descriptor->kernel_cs = KCODE_START;
 	descriptor->attributes = flags;
 	descriptor->isr_high = (uint32_t)isr >> 16;
-	descriptor->reserved = 1;
+	descriptor->reserved = 0;
 }
 
 void get_idt(idtr_t* p){
@@ -39,9 +39,15 @@ void idt_init(){
 	idtr_t address = {(uint16_t)sizeof(idtr_t) * 254, &vectors[0]};
 
 	plog("Setting up IRQ handlers...");
-	for(uint8_t vector = 0; vector < 32; vector++){
+
+	for(int vector = 0; vector < 32; vector++){
 		idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
+		print(".", 0b010);
+		sleep(1);
 	}
+	newline();
+
+	println("-> DONE!", 0b010);
 
 	plog("Registering IDT structure...");
 	__asm__ volatile("lidt %0" :: "m"(address));
@@ -60,4 +66,20 @@ void idt_init(){
 	else{panic("FAILED to set up IDT!"); bsod("ERR_IDT_FAIL", "p.base != address.base (/lib/interrupts/getaddr.h)"); __asm__("hlt");}
 
 	//__asm__ volatile("sti");
+}
+
+void ping_idt(void){
+	int i;
+	int ok = 0;
+	int okidexes[255];
+
+	for(i = 0; i < 255; i++){
+		if(vectors[i].isr_low > 0 || vectors[i].isr_high > 0){plog("IDT ENTRY OK!"); ok++; okidexes[i] = i;}
+		else{panic("IDT ENTRY BAD!");}
+
+		sleep(1);
+	}
+
+	for(int i = 0; i < 255; i++){if(okidexes[i] > 0){printf("%d%s\n", okidexes[i], " is OK.");}}
+	printf("%d%s\n", ok, "/255 entries OK.");
 }

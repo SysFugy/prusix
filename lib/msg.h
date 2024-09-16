@@ -8,25 +8,25 @@
 /////////////////// Print log //////////////////
 
 char plog (char *text) {
-	print(" - [  ", 15);
-	print("LOG", 10);
-	print("  ] ", 15);
-	println(text, 15);
+	print(" - [  ", 0b111);
+	print("LOG", 0b010);
+	print("  ] ", 0b111);
+	println(text, 0b011);
 }
 
 ////////////////// Print panic /////////////////
 
 char panic (char *text) {
-	print(" - [ ", 15);
-	print("PANIC", 12);
-	print(" ] ", 15);
-	println(text, 15);
+	print(" - [ ", 0b111);
+	print("PANIC", 0b100);
+	print(" ] ", 0b111);
+	println(text, 0b110);
 }
 
 //////////////// Throw BSOD ////////////////////
 
 char bsod (char* code, char* text){
-	uint16_t color = 0b00011111;
+	uint8_t color = 0b001;
 
 	clearscreen_bsod();
 	printcolor(" <- [ BSOD: ERROR CODE ", color);

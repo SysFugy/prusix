@@ -53,7 +53,9 @@ void init(const int mode) {
 			else if(strcmp(input_buffer, "test_bsod") == 0){bsod("909_TESTERROR", "THIS IS A TEST BSOD, PRESS ANY KEY TO LEAVE"); anykey();}
 			else if(strcmp(input_buffer, "test_printf") == 0){printf("%s%d\n", "string, next: number - ", 10);}
 			else if(strcmp(input_buffer, "test_mouse") == 0){printf("%s\n", "---> Running mouse test..."); scanMouse();}
-			else if(strcmp(input_buffer, "int") == 0){printf("%d\n", 0 / 0); while (1);}
+			else if(strcmp(input_buffer, "int") == 0){__asm__ volatile("int $3");}
+			else if(strcmp(input_buffer, "test_color") == 0){clearscreen_bsod();}
+			else if(strcmp(input_buffer, "idt") == 0){ping_idt();}
 			else if(strcmp(input_buffer, "im_ghoul") == 0){ghoul();}
 			else if (strcmp(input_buffer, "off") == 0) init(5);
 			else if (strncmp(input_buffer, "mode", 4) == 0) {

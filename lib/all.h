@@ -8,6 +8,8 @@
 #ifndef ALL_H
 #define ALL_H
 
+#define KCODE_START 0x1BADB002
+
 #include "acpi.h"
 #include "io.h"
 #include "string.h"

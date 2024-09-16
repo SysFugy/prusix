@@ -16,7 +16,10 @@ typedef struct{
 	uint8_t base_high;
 } __attribute__((packed)) GDT;
 
-GDT gdt[8];
+#define GDT_SIZE 8
+
+__attribute__((align(0x10)))
+GDT gdt[GDT_SIZE];
 
 // GDTR is a structure that should POINT to GDT, it can be passed to LGDT
 
@@ -38,7 +41,7 @@ void initGDT(){
 	GDTR address = getGDT();
 	
 	setGDTEntry(0, 0, 0, 0, 0);
-	//setGDTEntry(1, 0xB8000, 0xFFFFF, 0x9A, 0xC0);
+	setGDTEntry(1, KCODE_START, 0xFFFFF, 0x9A, 0xC0);
 	//setGDTEntry(2, 0xB8000, 0xFFFFF, 0x92, 0xC0);
 
 	if(address.offset == gdt){plog("-> OK!");}
