@@ -3,6 +3,7 @@ OUTPUT_DIR := ./boot
 ISO_NAME := prusix_v0-2.iso
 KERNEL_ASM := $(KERNEL_DIR)/kernel.asm
 KERNEL_C := $(KERNEL_DIR)/kernel.c
+KERNEL_CPP := $(KERNEL_DIR)/kernel.cpp
 KERNEL_ASM_OBJ := ./kernel_asm.o
 KERNEL_OBJ := ./kernel.o
 LINKER_SCRIPT := link.ld
@@ -23,7 +24,6 @@ compile_kernel: $(KERNEL_ASM_OBJ) $(KERNEL_OBJ)
 $(KERNEL_ASM_OBJ): $(KERNEL_ASM)
 	echo "[Prusix] Compiling assembly initialization part..."; \
 	nasm -f elf32 $(KERNEL_ASM) -o $(KERNEL_ASM_OBJ)
-	nasm -f elf32 ../lib/interrupts/idt.asm -o ../lib/interrupts/getaddr.o
 
 $(KERNEL_OBJ): $(KERNEL_C)
 	echo "[Prusix] Compiling kernel..."; \
@@ -45,6 +45,6 @@ clean:
 
 run: all
 	echo "[Prusix] Starting QEMU..."; \
-	qemu-system-i386 -m 40M -cdrom $(ISO_OUTPUT)
+	qemu-system-i386 -m 40M -d cpu_reset -D ./prusix_log.txt -cdrom $(ISO_OUTPUT)
 
 .PHONY: all check_tools compile_kernel build_kernel build_iso clean run

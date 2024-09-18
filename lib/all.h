@@ -23,7 +23,7 @@
 #include "../libc/all.h"
 
 #include "./fun/ghoul.h"
-#include "./interrupts/getaddr.h" // not yet.
+#include "./IDT/idt.h" // not yet.
 #include "./GDT/gdt.h"
 
 #endif 

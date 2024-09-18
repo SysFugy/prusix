@@ -6,7 +6,7 @@ void printf(char* format, ...){
 	while(*format != '\0'){
 		switch(*format++){
 			case 's':
-				print(va_arg(args, const char*), 15);
+				print(va_arg(args, const char*), 0b111);
 				break;
 			case 'd':
 				char* num;

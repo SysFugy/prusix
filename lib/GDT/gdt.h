@@ -16,13 +16,9 @@ typedef struct{
 	uint8_t base_high;
 } __attribute__((packed)) GDT;
 
-#define GDT_SIZE 8
+#define GDT_SIZE 64
 
-__attribute__((align(0x10)))
-GDT gdt[GDT_SIZE];
-
-// GDTR is a structure that should POINT to GDT, it can be passed to LGDT
-
+/*
 GDTR getGDT(){
 	GDTR gdt;
 
@@ -34,42 +30,16 @@ GDTR getGDT(){
 void initGDT(){
 	__asm__ volatile("cli");
 
-	GDTR gdtr = {sizeof(GDT) * 8, gdt};
 	plog("Loading GDT...");
-	__asm__("lgdt %0" :: "m"(gdtr));
+	__asm__ volatile("lgdt %0" :: "m"(gdtr));
 
 	GDTR address = getGDT();
 	
 	setGDTEntry(0, 0, 0, 0, 0);
 	setGDTEntry(1, KCODE_START, 0xFFFFF, 0x9A, 0xC0);
-	//setGDTEntry(2, 0xB8000, 0xFFFFF, 0x92, 0xC0);
-
+	setGDTEntry(2, KCODE_START, 0xFFFFF, 0x92, 0xC0);
 	if(address.offset == gdt){plog("-> OK!");}
 	else{bsod("GDT_ERR_CODE", "FAILED TO SET GDT ADDRESS"); __asm__("hlt");}
-}
-
-/*
-void encodeGdtEntry(uint8_t *target, struct GDT source)
-{
-	if (source.limit > 0xFFFFF) {kerror("GDT cannot encode limits larger than 0xFFFFF");}
-
-	target[0] = source.limit & 0xFF;
-	target[1] = (source.limit >> 8) & 0xFF;
-	target[6] = (source.limit >> 16) & 0x0F;
-
-	target[2] = source.base & 0xFF;
-	target[3] = (source.base >> 8) & 0xFF;
-	target[4] = (source.base >> 16) & 0xFF;
-	target[7] = (source.base >> 24) & 0xFF;
-
-	target[5] = source.access_byte;
-
-	target[6] |= (source.flags << 4);
-}*/
-
-void setNextGDTEntry(uint8_t entry){
-	*GDTpointer = entry;
-	GDTpointer++;
 }
 
 void setGDTEntry(int index, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity){
@@ -84,3 +54,4 @@ void setGDTEntry(int index, uint32_t base, uint32_t limit, uint8_t access, uint8
 
 	gdt[index].access = access;
 }
+*/
