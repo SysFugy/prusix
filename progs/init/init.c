@@ -56,7 +56,7 @@ void init(const int mode) {
 			else if(strcmp(input_buffer, "int") == 0){__asm__ volatile("int $27");}
 			else if(strcmp(input_buffer, "test_color") == 0){clearscreen_bsod();}
 			else if(strcmp(input_buffer, "idt") == 0){ping_idt();}
-			//else if(strcmp(input_buffer, "gdt") == 0){ping_gdt();}
+			else if(strcmp(input_buffer, "gdt") == 0){ping_gdt();}
 			else if(strcmp(input_buffer, "im_ghoul") == 0){ghoul();}
 			else if (strcmp(input_buffer, "off") == 0) init(5);
 			else if (strncmp(input_buffer, "mode", 4) == 0) {
