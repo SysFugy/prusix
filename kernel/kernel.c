@@ -56,6 +56,17 @@ void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
 
 void idt_init(void);
 void idt_init(){
+	idtr.base = (uintptr_t)&idt[0];
+	idtr.limit = (uint16_t)sizeof(idt_entry_t) * 254;
+
+	for(int i = 0; i < 32; i++){
+		if(isr_stub_table[i]){
+			idt_set_descriptor(i, isr_stub_table[i], 0x8E);
+		}
+		else{bsod("ERR_NO_IVEC", "NO IVEC FOUND!");}
+	}
+
+	__asm__ volatile("lidt %0" :: "m"(idtr));
 }
 
 void ping_idt(){
@@ -77,7 +88,9 @@ void setGDTEntry(int index, uint32_t base, uint32_t limit, uint8_t access, uint8
 __attribute__((noreturn))
 void exception_handler(void);
 void exception_handler() {
-	panic("EXCEPTION!");
+	bsod("ERR_EXCEPTION_GAY", "CPU EXCEPTION! ANY KEY TO POWER OFF!");
+	anykey();
+	acpi_off();
 }
 
 void kmain(void) {
