@@ -7,20 +7,7 @@
 
 //////////////////// RAM ///////////////////////
 
-void check_mem() {
-    unsigned int memory_size;
 
-    asm (
-        "movl $0x8800, %%eax\n"
-        "int $0x15\n"
-        "movl %%eax, %0\n"
-        : "=r" (memory_size)
-        :
-        : "%eax"
-    );
-
-    plog("Memory found");
-}
 
 ///////////////////// ACPI /////////////////////
 
@@ -69,33 +56,12 @@ void check_acpi(void) {
         for (unsigned int i = 0; i < rsdp->length; i++) sum += ptr[i];
 
         if (sum == 0) plog("ACPI is working");
-        else panic("0x0000009F");
-    } else panic("0x00000124");
+        else panic("9F_ACPI_ERROR", "ACPI PANIC, PRESS ANY KEY TO LEAVE");
+    } else panic("124_HARDWARE_ERROR", "ACPI NOT FOUND, PRESS ANY KEY TO LEAVE");
 }
 
 //////////////////// VGA ///////////////////////
 
-
-bool vga_support() {
-    uint8_t mode;
-    
-    asm (
-        "mov $0x00, %%ah\n"
-        "mov $0x03, %%al\n"
-        "int $0x10\n"
-        "mov %%al, %0\n"
-        : "=r" (mode)
-        :
-        : "ax"
-    );
-    
-    return mode == 0x03;     
-}
-
-void check_vga() {
-	if(vga_support()) plog("VGA is working");
-	else panic("0x0000009F");
-}
 
 ///////////////////// PS/2 /////////////////////
 
@@ -112,7 +78,9 @@ void check_vga() {
 
 int check_ps2() {
     uint8_t status = inb(PS2_STATUS_PORT);
-    if (status & PS2_STATUS_PARITY_ERROR) panic("0x00000000");
-    if (status & PS2_STATUS_TIMEOUT_ERROR) panic("0x00000000");
+    if (status & PS2_STATUS_PARITY_ERROR) sod("PS2_STATUS_PARITY_ERROR", "PS/2 STATUS PATIRY ERROR, PRESS ANY KEY TO LEAVE");
+    if (status & PS2_STATUS_TIMEOUT_ERROR) sod("PS2_STATUS_TIMEOUT_ERROR", "PS/2 STATUS TIMEOUT ERROR, PRESS ANY KEY TO LEAVE");
     plog("PS/2 is working");
 }
+
+///////////////////// IDT //////////////////////

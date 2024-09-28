@@ -1,3 +1,8 @@
+;
+;            idt.asm
+;              IDT
+;
+
 %macro isr_err_stub 1
 isr_stub_%+%1:
     call exception_handler

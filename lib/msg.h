@@ -16,16 +16,17 @@ char plog (char *text) {
 
 ////////////////// Print panic /////////////////
 
-char panic (char *text) {
+char panic (char *text, char *desc) {
 	print(" - [ ", 0b111);
 	print("PANIC", 0b100);
 	print(" ] ", 0b111);
 	println(text, 0b110);
+	println(desc, 0b110);
 }
 
-//////////////// Throw BSOD ////////////////////
+///////////////// Throw SOD ////////////////////
 
-char bsod (char* code, char* text){
+char sod (char* code, char* text){
 	uint8_t color = 0b001;
 
 	clearscreen_bsod();

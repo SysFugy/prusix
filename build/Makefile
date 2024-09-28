@@ -1,6 +1,6 @@
 KERNEL_DIR := ../kernel
 OUTPUT_DIR := ./boot
-ISO_NAME := prusix_v0-2.iso
+ISO_NAME := prusix_v0-3.iso
 KERNEL_ASM := $(KERNEL_DIR)/kernel.asm
 KERNEL_C := $(KERNEL_DIR)/kernel.c
 KERNEL_CPP := $(KERNEL_DIR)/kernel.cpp
@@ -27,7 +27,7 @@ $(KERNEL_ASM_OBJ): $(KERNEL_ASM)
 
 $(KERNEL_OBJ): $(KERNEL_C)
 	echo "[Prusix] Compiling kernel..."; \
-	gcc -fno-stack-protector -m32 -c $(KERNEL_C) -o $(KERNEL_OBJ)
+	gcc -fno-stack-protector -c $(KERNEL_C) -o $(KERNEL_OBJ)
 
 build_kernel: $(KERNEL_ASM_OBJ) $(KERNEL_OBJ)
 	echo "[Prusix] Linking libraries..."; \

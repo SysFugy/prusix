@@ -1,9 +1,14 @@
+;
+;                kernel.asm
+;            LowLevel kernel code
+;
+
 bits 32
 section .text
-        align 4
-        dd 0x1BADB002               
-        dd 0x00                     
-        dd - (0x1BADB002 + 0x00)    
+    align 4
+    dd 0x1BADB002               
+    dd 0x00                     
+    dd - (0x1BADB002 + 0x00)    
 
 global port_byte_in
 global start
@@ -12,20 +17,20 @@ extern kmain
 extern exception_handler    
 
 port_byte_in:
- mov dx, word [esp + 4]
- in al, dx
- ret
+    mov dx, word [esp + 4]
+    in al, dx
+    ret
 
 start:
- cli     
- mov esp, stack_space  
- call kmain
- hlt     
+    cli
+    mov esp, stack_space
+    call kmain
+    hlt
 
 %macro isr_err_stub 1
 isr_stub_%+%1:
     call exception_handler
-    iret 
+    iret
 %endmacro
 
 %macro isr_no_err_stub 1
@@ -44,14 +49,14 @@ isr_no_err_stub 6
 isr_no_err_stub 7
 isr_err_stub    8
 isr_no_err_stub 9
-isr_err_stub    10
-isr_err_stub    11
-isr_err_stub    12
-isr_err_stub    13
-isr_err_stub    14
+isr_err_stub   10
+isr_err_stub   11
+isr_err_stub   12
+isr_err_stub   13
+isr_err_stub   14
 isr_no_err_stub 15
 isr_no_err_stub 16
-isr_err_stub    17
+isr_err_stub   17
 isr_no_err_stub 18
 isr_no_err_stub 19
 isr_no_err_stub 20
@@ -64,16 +69,16 @@ isr_no_err_stub 26
 isr_no_err_stub 27
 isr_no_err_stub 28
 isr_no_err_stub 29
-isr_err_stub    30
+isr_err_stub   30
 isr_no_err_stub 31
 
 global isr_stub_table
 isr_stub_table:
 
 %assign i 0 
-%rep    32 
+%rep 32 
     dd isr_stub_%+i
-%assign i i+1 
+    %assign i i + 1
 %endrep
 
 section .bss
