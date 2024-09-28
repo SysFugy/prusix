@@ -13,10 +13,13 @@
 #include "libc/all.h"
 
 #include "msg.h"
-#include "check_drivers.h"
 
 #include "./fun/triangle.h"
 #include "./IDT/idt.h"
 #include "./GDT/gdt.h"
+
+#include "hardboot.h"
+
+#include "check_drivers.h"
 
 #endif 

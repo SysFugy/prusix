@@ -42,7 +42,7 @@ bool find_rsdp(acpi_rsdp_t **rsdp) {
             candidate->signature[7] == ' ') {
             *rsdp = candidate;
             return true;
-        }
+        } // это ужасно
     }
     return false;
 }
@@ -84,3 +84,11 @@ int check_ps2() {
 }
 
 ///////////////////// IDT //////////////////////
+
+void check_GDT(){
+    idtr_t idtcopy;
+
+    __asm__ volatile("sidt %0" : "=m"(idtcopy));
+
+    if(idtcopy.base >= 0 && idtcopy.limit >= 0){plog("IDT is working.");}
+}

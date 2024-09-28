@@ -33,14 +33,14 @@ void idt_init(void) {
 
     for(int i = 0; i < 32; i++) {
         if(isr_stub_table[i]) idt_set_descriptor(i, isr_stub_table[i], 0x8E);
-        else bsod("ERR_NO_IVEC", "NO IVEC FOUND!");
+        else sod("ERR_NO_IVEC", "NO IVEC FOUND!");
     }
 
     __asm__ volatile("lidt %0" :: "m"(idtr));
 }
 
 void exception_handler(void) {
-    bsod("ERR_EXCEPTION", "CPU EXCEPTION! ANY KEY TO POWER OFF!");
+    sod("ERR_EXCEPTION", "CPU EXCEPTION! ANY KEY TO POWER OFF!");
     anykey();
     acpi_off();
 }

@@ -15,7 +15,7 @@ void init(const int mode) {
 	else if (mode == 1) {
 		//check_mem();
 		check_acpi();
-		//check_idt();
+		check_idt();
 		check_ps2();
 		//check_gdt();
 
