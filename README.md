@@ -1,4 +1,5 @@
-# Prusix
+# Prusix [Archived garbage]
+# Kernel is moved to local storage
 
 Soon
 
